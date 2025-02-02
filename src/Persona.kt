@@ -1,35 +1,62 @@
 
 
-class Persona(val DNI: String, cuentas: Array<Cuenta?>) {
+class Persona(val DNI: String) {
 
     var cuentas: Array<Cuenta?> = Array(3) { null }
 
-    fun agregarCuenta(cuenta: Cuenta) {
-        var cambios = 0
+    fun esMorosa(persona: Persona): Boolean {
+        return persona.cuentas.find { it!= null && it.saldo < 0 } != null
+    }
 
-        if (cuentas.size + 1 !in 0..3) {
-            println("No puedes agregar más de tres cuentas")
-            return
+    fun transferencia(personaA: Persona, personaB: Persona, id1: Int, id2: Int, cantidad: Double): Boolean {
+
+        var cuenta1: Cuenta? = null
+        var cuenta2: Cuenta? = null
+
+        for (cuenta in personaA.cuentas) {
+            if (cuenta?.numCuenta == id1) {
+                cuenta1 = cuenta
+            }
         }
 
-        if (cuenta in cuentas) {
+        for (cuenta in personaB.cuentas) {
+            if (cuenta?.numCuenta == id2) {
+                cuenta2 = cuenta
+            }
+        }
+
+        if (cuenta1 == null || cuenta2 == null) {
+            println("Alguna de las cuentas introducidas no fue encontrada")
+            return false
+        }
+
+        cuenta1.saldo - cantidad
+        cuenta2.saldo + cantidad
+        println("Transferencia exitosa")
+        return true
+    }
+
+
+    fun agregarCuenta(cuenta: Cuenta) {
+
+        if (cuentas.contains(cuenta)) {
             println("Esta cuenta ya ha sido introducida")
             return
         }
 
-        cuentas.forEachIndexed { index, elemento ->
-            if (elemento == null) {
+        for (index in cuentas.indices) {
+            if (cuentas[index] == null) {
                 cuentas[index] = cuenta
-                cambios++
-                return@forEachIndexed
+                println("Cuenta agregada correctamente")
+                return
             }
         }
 
-        if (cambios == 0) {
-            println("No se ha podido ejecutar ningún cambio")
-            return
-        }
-
+        println("No se ha podido agregar la cuenta")
     }
 
+    override fun toString(): String {
+        val cuentasInfo = cuentas.filterNotNull().joinToString(", ") { "NumCuenta: ${it.numCuenta}, Saldo: ${it.saldo}" }
+        return "Persona DNI: $DNI, Cuentas: [$cuentasInfo]"
+    }
 }
